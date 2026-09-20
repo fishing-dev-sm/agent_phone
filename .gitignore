@@ -1,0 +1,5 @@
+node_modules/
+.runtime/
+.env
+.DS_Store
+client/phone-report.env

@@ -1,0 +1,18 @@
+{
+  "name": "agent-phone",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "LAN-shared HT802 analog telephone gateway for local coding agents (fork of codex-redline, retargeted to Kimi Code and multi-host use)",
+  "scripts": {
+    "start": "node src/phone-control.mjs start",
+    "status": "node src/phone-control.mjs status",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.21.3"
+  }
+}
