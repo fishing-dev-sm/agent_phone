@@ -20,7 +20,7 @@ Turn a Grandstream HT802 analog telephone gateway into a phone interface shared 
 | M6 | Engine on a dedicated host (systemd) + TCP+token RPC + phone-report skill (works for Kimi Code and Codex CLI); `say`/`ask` pass end-to-end | ✅ |
 | M7 | Busy-line policy: server-side FIFO queue (cap 8) + auto-retry ×5 on no answer + text archive of every report (phone-reports.jsonl) | ✅ |
 | M8 | Reporting discipline: default to `ask`; call details never written into project artifacts; hard length limit relaxed to soft compression | ✅ |
-| M9 | Server-side LLM compression of overlong reports (Qwen3 via SSH tunnel); original + spoken version both archived | ✅ |
+| M9 | Server-side LLM compression of overlong reports (Qwen3 behind a LiteLLM proxy); original + spoken version both archived | ✅ |
 
 Unit tests: `npm test` — 57 tests, all green.
 
@@ -35,13 +35,13 @@ desk phone ─ FXS ─ HT802V2 ──LAN(UDP SIP/RTP)── companion (systemd a
                                                 │  HTTP (OpenAI-compatible)
                                                 ├── TTS: http://speech-host:8300/v1/audio/speech         (Kokoro-82M)
                                                 ├── STT: http://speech-host:8300/v1/audio/transcriptions (SenseVoice-Small)
-                                                └── long-text compression: 127.0.0.1:8301 →(SSH tunnel)→ gpu-host llama.cpp (Qwen3)
+                                                └── long-text compression: gpu-host LiteLLM proxy :8090 (per-app API keys) → llama.cpp (Qwen3)
 ```
 
 - The companion is the single "line owner": one FXS port = one concurrent call, and an off-hook INVITE only goes to the configured SIP server
 - The companion runs as a systemd user service and exposes two interfaces: a local unix socket (management) + LAN TCP RPC (port 5091, token auth) for agents on any host
 - The speech service is deployed independently (any OpenAI-compatible endpoint works — SenseVoice + Kokoro are just the reference setup)
-- Overlong reports (>100 chars) are compressed server-side by an LLM before being spoken (`compressForSpeech`; falls back to sentence-boundary truncation, always ≤100 chars). The compression LLM is reached over an SSH tunnel so llama-server stays bound to localhost; when `PHONE_CHAT_ENDPOINT` is unset, truncation is the fallback
+- Overlong reports (>100 chars) are compressed server-side by an LLM before being spoken (`compressForSpeech`; falls back to sentence-boundary truncation, always ≤100 chars). Any OpenAI-compatible chat endpoint works (`PHONE_CHAT_ENDPOINT`/`PHONE_CHAT_MODEL`/`PHONE_CHAT_KEY`) — the reference setup is a LiteLLM proxy with per-app virtual keys in front of a LAN llama.cpp server; when unset, truncation is the fallback
 
 ## phone-report skill (agents calling you)
 
