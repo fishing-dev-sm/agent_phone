@@ -112,7 +112,7 @@ client/phone-report.mjs   zero-dependency TCP RPC client (say/ask/status), invok
 skills/phone-report/      Kimi/Codex-universal skill (SKILL.md); skills/install.sh installs idempotently
 test/                     unit tests (node --test)
 ht802-configure.py        HT802V2 provision / backup / rollback
-docs/                     firmware pitfalls, acceptance log (Chinese)
+docs/                     firmware pitfalls, acceptance log, open-sourcing release notes (Chinese)
 ```
 
 Upstream content intentionally not migrated (not needed here): `native/` (macOS Swift: accessibility typing, BlackHole microphone bridge), `phone_hook.py` / `install-phone-hooks.py` (Codex hooks), `skills/redline-phone-bind` (Codex skill).
